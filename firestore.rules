@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 0. 전역 기본 차단 (Default Deny All)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 1. 보안 검증 헬퍼 함수
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidAssignment(data) {
+      return data.keys().hasAll(['studentName', 'quizScore', 'bandlabUrl']) &&
+        data.keys().hasOnly(['studentName', 'quizScore', 'bandlabUrl', 'createdAt', 'submissionId', 'emotionTheme']) &&
+        data.studentName is string &&
+        data.studentName.size() >= 1 &&
+        data.studentName.size() <= 50 &&
+        data.quizScore is number &&
+        data.quizScore >= 0 &&
+        data.quizScore <= 100 &&
+        data.bandlabUrl is string &&
+        data.bandlabUrl.size() >= 8 &&
+        data.bandlabUrl.size() <= 300 &&
+        (!('emotionTheme' in data) || (data.emotionTheme is string && data.emotionTheme.size() <= 100));
+    }
+
+    // 2. 학생 과제 제출 컬렉션 (assignments)
+    // 보안 목표: 학생 누구나 자신의 이름/퀴즈점수/BandLab 링크를 제출할 수 있으나,
+    // 다른 학생들의 제출 내역을 조회(list/get)하거나 위·변조(update/delete)할 수 없음.
+    match /assignments/{assignmentId} {
+      // 신규 과제 제출 허용 (데이터 스키마 및 길이 엄격 검증)
+      allow create: if isValidId(assignmentId) && isValidAssignment(incoming());
+
+      // 다른 학생의 개인정보 및 과제 URL 보호: 전체 목록 조회 및 타인 단건 조회 전면 차단
+      // (교사 콘솔 또는 Firebase Console 관리자만 열람 가능)
+      allow read: if false;
+
+      // 제출 후 임의 변경 및 삭제 차단 (제출 데이터의 무결성 보장)
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}

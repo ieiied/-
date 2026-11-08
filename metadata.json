@@ -1,0 +1,6 @@
+{
+  "name": "작곡 첫걸음 - 고교생을 위한 밴드랩 & 음악 이론 스튜디오",
+  "description": "고등학생을 위한 기초 음악 이론, BandLab 실전 가이드, 웹 피아노·드럼 비트 시뮬레이터 및 과제 제출이 통합된 밝고 귀여운 작곡 입문 가이드",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

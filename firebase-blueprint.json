@@ -1,0 +1,48 @@
+{
+  "entities": {
+    "Assignment": {
+      "title": "Assignment",
+      "description": "음악 수업 과제 제출 데이터 모델",
+      "type": "object",
+      "properties": {
+        "studentName": {
+          "type": "string",
+          "description": "학생 이름 (학번 또는 성명)",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "quizScore": {
+          "type": "number",
+          "description": "기초 음악 이론 퀴즈 점수 (0-100)"
+        },
+        "bandlabUrl": {
+          "type": "string",
+          "description": "밴드랩(BandLab) 프로젝트 공유 URL 링크",
+          "maxLength": 300
+        },
+        "emotionTheme": {
+          "type": "string",
+          "description": "곡에 담아 표현하고자 한 학생의 감정 및 무드 (예: 비 오는 날의 쓸쓸함, 설레는 첫사랑)",
+          "maxLength": 100
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "과제 제출 일시"
+        },
+        "submissionId": {
+          "type": "string",
+          "description": "클라이언트 제출 고유 식별자",
+          "maxLength": 100
+        }
+      },
+      "required": ["studentName", "quizScore", "bandlabUrl"]
+    }
+  },
+  "firestore": {
+    "/assignments/{assignmentId}": {
+      "schema": "Assignment",
+      "description": "학생들의 밴드랩 음악 작곡 과제 제출 목록. 다른 학생의 개인정보 및 과제 유출을 방지하기 위해 전체 목록 조회(list)가 차단됩니다."
+    }
+  }
+}
